@@ -7,7 +7,7 @@ args: "[new|refresh|extend] — new = fresh interview, refresh = re-analyze code
 
 # /coding-interview — Coding Style Interview
 
-Extract a developer's coding DNA through structured conversation and codebase analysis. Produces or updates `~/.claude/skills/coding-standards/` files.
+Extract a developer's coding DNA through structured conversation and codebase analysis. Generates personalized coding standards — either in the project (for teams) or personally (for individuals).
 
 ## When to Use
 
@@ -117,15 +117,31 @@ After confirming all topics, identify what's NOT covered:
 
 ### Phase 5: Generate Standards
 
-Before generating, ask the developer where to save:
+Before generating, help the developer decide where to save. First, detect the context:
 
-> "Where should I save the coding standards?
+- Is this a team project? (check: `.git/` with remote, multiple contributors in `git log`, org in remote URL)
+- Is there already a `.claude/` directory in the project?
+- Are there existing CLAUDE.md files?
+
+Then present the options with a **recommendation**:
+
+> "Before I generate the standards, where should they live?
 >
-> **A) Project (recommended for teams)** — saves to `.claude/` in your project repo. Your whole team gets the same rules when they clone the repo. Committed to git.
+> **A) Project (recommended for teams)** — I'll create `.claude/rules/` in your repo with all the standards. They get committed to git, so every developer who clones this repo gets the same rules automatically. Claude Code reads `.claude/rules/*.md` for every conversation in this project. The pre-commit hook also goes in the repo.
 >
-> **B) Personal** — saves to `~/.claude/skills/` on your machine only. Good for personal preferences across all your projects.
+> **B) Personal** — I'll save them to `~/.claude/skills/coding-standards/` on your machine. They apply to YOU across all projects, but teammates won't have them.
 >
-> **C) Both** — shared rules in the project, personal overrides in your home directory."
+> **C) Both** — Shared team rules in the project repo + your personal preferences in `~/.claude/skills/`.
+>
+> [Based on what I see: your project has [N contributors / a remote / .claude/ already exists], so I'd recommend **A (Project)** — your team will thank you.]"
+
+**Decision guidance for Claude:**
+- Solo developer, single project -> recommend **B (Personal)** — simpler
+- Solo developer, multiple projects -> recommend **B (Personal)** — rules apply everywhere
+- Team project (2+ contributors) -> recommend **A (Project)** — shared enforcement
+- Team project where dev has personal extras -> recommend **C (Both)**
+- Open source project -> recommend **A (Project)** — contributors get standards on clone
+- If unsure, ask: "Is anyone else working in this codebase?"
 
 #### Option A: Project-scoped (team)
 
@@ -341,62 +357,92 @@ The generated standards must be:
 
 ## File Structure to Generate
 
+**Project-scoped (team):**
+```
+your-project/
+├── .claude/
+│   └── rules/                        # Claude reads these automatically
+│       ├── coding-standards.md       # Entry point with philosophy
+│       ├── reuse-first.md
+│       ├── naming-conventions.md
+│       ├── [stack-specific].md       # Only files matching detected stack
+│       └── ...
+├── scripts/
+│   └── check-coding-standards.sh     # Pre-commit hook
+└── .coding-standards-ignore          # Accepted tech debt
+```
+
+**Personal:**
 ```
 ~/.claude/skills/coding-standards/
-├── SKILL.md                          # Entry point + manifest
+├── SKILL.md                          # Entry point (auto-loaded)
 ├── lint-config.md                    # Severity levels
 ├── rules/
-│   ├── reuse-first.md                # Extend vs create philosophy
-│   ├── component-architecture.md     # Component anatomy, props, CVA
-│   ├── naming-conventions.md         # All naming rules
-│   ├── file-organization.md          # Domain-driven structure
-│   ├── types-and-constants.md        # Type/constant reuse hierarchy
-│   ├── typescript-quality.md         # Strict mode, type patterns
-│   ├── react-patterns.md             # Server/client, hooks, anti-patterns
-│   ├── tailwind-and-tokens.md        # Styling rules (if Tailwind)
-│   ├── state-management.md           # Where state lives
-│   ├── [backend].md                  # Backend-specific (convex/prisma/etc)
-│   ├── security.md                   # Auth, validation, secrets
-│   ├── error-handling.md             # Boundaries, retry, resilience
-│   └── general-quality.md            # Idioms, comments, defensive coding
+│   └── [stack-specific].md           # Only files matching detected stack
 └── checklists/
-    ├── before-creating.md            # Pre-coding guard
-    └── before-committing.md          # Post-write checklist
+    ├── before-creating.md
+    └── before-committing.md
 ```
 
-Not all files are needed for every project. Skip files for areas the project doesn't use (e.g., skip convex-backend.md for a Prisma project).
+Only generate rule files for stacks detected in the project. A Go project doesn't get `react-patterns.md`. A Django project doesn't get `typescript-quality.md`. See `stack-detection.md` Step 4 for the mapping.
 
-### Phase 6: Wire Into CLAUDE.md
+### Phase 6: Wire Everything Together
 
-After generating all files, integrate them so Claude always sees the standards:
+After generating all files, connect them so Claude and the team always see the standards.
 
-1. **Global CLAUDE.md** (`~/.claude/CLAUDE.md`):
-   - Add `coding-standards/SKILL.md` to auto-loaded skills list
-   - Remove any duplicated coding rules (they now live in coding-standards)
-   - Add a "Coding Standards" section pointing to the skill
+#### If Project-scoped (Option A):
 
-2. **Project CLAUDE.md** (if exists):
-   - Remove duplicated coding rules
-   - Keep project-specific info (token catalogs, DLS inventory, workflow)
-   - Add pointer: "All coding rules in `~/.claude/skills/coding-standards/`"
-
-3. **Existing lint/organize skills** (if they exist):
-   - Update to reference `coding-standards/lint-config.md` for severity
-   - Remove their own rule copies
-
-4. **Delete redundant files**:
-   - Any old skill files whose content was consolidated into coding-standards
-   - Confirm with developer before deleting
-
-5. **Confirm with developer**:
-   > "Standards are set up. Here's what changed:
-   > - Created: [N] rule files in coding-standards/
-   > - Updated: CLAUDE.md (removed [N] lines of duplicated rules)
-   > - Deleted: [list of old files]
-   > - Pre-commit hook: [installed/offered]
+1. **Create/update `.claude/rules/`** — files are already there from Phase 5
+2. **Create/update project CLAUDE.md** (`.claude/CLAUDE.md` or root `CLAUDE.md`):
+   - Add: "Coding standards are in `.claude/rules/` — Claude reads them automatically"
+   - Remove any duplicated coding rules from existing CLAUDE.md
+   - Keep project-specific info (token catalogs, architecture, workflow)
+3. **Set up pre-commit hook** in the project:
+   - Generate `scripts/check-coding-standards.sh` with stack-appropriate checks (read `hook-generation.md`)
+   - Detect existing hook system (Husky? pre-commit? Lefthook? raw git?) or recommend one
+   - Wire the script into the hook system
+   - Commit both the script and hook config to git
+4. **Add `.coding-standards-ignore`** to the project root (empty, with header comments explaining format)
+5. **Confirm with developer** and suggest they commit:
+   > "Standards are set up for your team:
+   > - Created: `.claude/rules/` with [N] rule files
+   > - Created: `scripts/check-coding-standards.sh` (pre-commit hook)
+   > - Updated: CLAUDE.md
    >
-   > From now on, coding-standards/ is the single source of truth.
-   > Use `/coding-interview refresh` anytime to re-analyze."
+   > When your teammates pull these changes, they'll get:
+   > - Claude automatically following the standards (via `.claude/rules/`)
+   > - Pre-commit hook enforcing rules on every commit
+   >
+   > Want me to commit these files now?"
+
+#### If Personal (Option B):
+
+1. **Files are in `~/.claude/skills/coding-standards/`** — already there from Phase 5
+2. **Update global CLAUDE.md** (`~/.claude/CLAUDE.md`):
+   - Add `coding-standards/SKILL.md` to auto-loaded skills list
+   - Remove any duplicated coding rules
+3. **Set up pre-commit hook** in the current project:
+   - Still generate `scripts/check-coding-standards.sh` in the PROJECT (enforcement is always project-level)
+   - Wire into hook system
+4. **Confirm**:
+   > "Standards are set up for you personally:
+   > - Created: `~/.claude/skills/coding-standards/` with [N] rule files
+   > - Created: `scripts/check-coding-standards.sh` in this project
+   >
+   > These rules apply to all your projects. The pre-commit hook is project-specific."
+
+#### If Both (Option C):
+
+1. Do both: project `.claude/rules/` for team + `~/.claude/skills/coding-standards/` for personal
+2. Personal rules supplement/override project rules
+3. Pre-commit hook is always in the project
+
+#### Clean up redundant files
+
+Regardless of scope:
+- Delete any old skill files whose content was consolidated into coding-standards
+- Confirm with developer before deleting anything
+- If they had scattered rules in CLAUDE.md, lint configs, etc. — consolidate into the new structure
 
 ## Sub-Files (Read During Execution)
 
