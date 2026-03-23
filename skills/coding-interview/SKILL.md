@@ -117,21 +117,78 @@ After confirming all topics, identify what's NOT covered:
 
 ### Phase 5: Generate Standards
 
-Based on the interview, generate or update the coding-standards files:
+Before generating, ask the developer where to save:
 
-**If new project (`/coding-interview new`):**
+> "Where should I save the coding standards?
+>
+> **A) Project (recommended for teams)** — saves to `.claude/` in your project repo. Your whole team gets the same rules when they clone the repo. Committed to git.
+>
+> **B) Personal** — saves to `~/.claude/skills/` on your machine only. Good for personal preferences across all your projects.
+>
+> **C) Both** — shared rules in the project, personal overrides in your home directory."
 
-All files are generated in `~/.claude/skills/coding-standards/` (your Claude Code skills directory, NOT your project repo). The pre-commit hook script is generated in your project's `scripts/` folder.
+#### Option A: Project-scoped (team)
 
-Files created:
-- `SKILL.md` — entry point with philosophy + manifest
+```
+your-project/
+  .claude/
+    settings.json               # Can reference the standards
+    rules/                      # Project coding standards (committed to git)
+      coding-standards.md       # Entry point with philosophy + manifest
+      reuse-first.md
+      naming-conventions.md
+      file-organization.md
+      [stack-specific].md       # Only the rules matching this project's stack
+      ...
+    checklists/
+      before-creating.md
+      before-committing.md
+  scripts/
+    check-coding-standards.sh   # Pre-commit hook (committed to git)
+```
+
+This means:
+- Standards are **version-controlled** alongside the code
+- Every developer who clones the repo gets the same rules
+- Claude Code auto-reads `.claude/rules/*.md` for every conversation in this project
+- PRs can include rule changes (reviewed like any code change)
+- The pre-commit hook is also committed — enforced for the whole team
+
+#### Option B: Personal (individual)
+
+```
+~/.claude/skills/coding-standards/
+  SKILL.md
+  lint-config.md
+  rules/
+    [all rule files]
+  checklists/
+    [all checklists]
+```
+
+This means:
+- Rules apply to YOU across all projects
+- Not shared with teammates
+- Good for personal style preferences that apply everywhere
+
+#### Option C: Both (team + personal overrides)
+
+- Shared rules in `.claude/rules/` (committed)
+- Personal overrides or additions in `~/.claude/skills/coding-standards/`
+- Personal rules take precedence when both exist for the same topic
+
+#### What gets generated
+
+Files created (in whichever location chosen):
+- Entry point with philosophy + manifest
 - `lint-config.md` — severity levels (BLOCKING/WARNING/INFO)
 - `rules/` — only the rule files matching your detected stack (see stack-detection.md Step 4)
 - `checklists/before-creating.md` — 5 pre-coding questions
 - `checklists/before-committing.md` — post-write validation checklist
-- `scripts/check-coding-standards.sh` — pre-commit hook (in your PROJECT repo)
+- `scripts/check-coding-standards.sh` — pre-commit hook (always in PROJECT repo)
 
-Then update `~/.claude/CLAUDE.md` to auto-load the standards.
+**If new project (`/coding-interview new`):**
+- Full interview, generates all files in chosen location
 
 **If refresh (`/coding-interview refresh`):**
 - Re-analyze codebase against existing standards

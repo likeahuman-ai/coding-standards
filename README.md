@@ -45,11 +45,24 @@ cd coding-standards
 3. Presents your "Code Style Profile" based on what it found
 4. Interviews you topic-by-topic to confirm and deepen
 5. Finds gaps and suggests rules for uncovered areas
-6. Generates coding-standards files personalized to your stack
-7. Sets up a pre-commit hook that enforces the rules
-8. Dry runs the hook on your full codebase and helps you fix violations
+6. **Asks where to save: project (team) or personal**
+7. Generates coding-standards files personalized to your stack
+8. Sets up a pre-commit hook that enforces the rules
+9. Dry runs the hook on your full codebase and helps you fix violations
 
 The whole process takes one conversation. After that, every commit is checked automatically.
+
+### For teams or for yourself
+
+You choose where the standards live:
+
+| Option | Where | Who gets them | Best for |
+|---|---|---|---|
+| **Project** | `.claude/rules/` in your repo | Everyone who clones the repo | Teams, open source, shared codebases |
+| **Personal** | `~/.claude/skills/` on your machine | Just you, across all projects | Personal preferences |
+| **Both** | Project + personal overrides | Team gets shared rules, you get extras | Team lead with personal additions |
+
+**Project-scoped standards** are committed to git. When a teammate clones the repo, Claude Code reads `.claude/rules/*.md` automatically — no setup needed on their end. The pre-commit hook is also committed, so enforcement is team-wide.
 
 ## The Interview (7 phases)
 
