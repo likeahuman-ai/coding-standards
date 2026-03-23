@@ -117,31 +117,15 @@ After confirming all topics, identify what's NOT covered:
 
 ### Phase 5: Generate Standards
 
-Before generating, help the developer decide where to save. First, detect the context:
+Before generating, ask where to save:
 
-- Is this a team project? (check: `.git/` with remote, multiple contributors in `git log`, org in remote URL)
-- Is there already a `.claude/` directory in the project?
-- Are there existing CLAUDE.md files?
-
-Then present the options with a **recommendation**:
-
-> "Before I generate the standards, where should they live?
+> "Where should I put the coding standards?
 >
-> **A) Project (recommended for teams)** — I'll create `.claude/rules/` in your repo with all the standards. They get committed to git, so every developer who clones this repo gets the same rules automatically. Claude Code reads `.claude/rules/*.md` for every conversation in this project. The pre-commit hook also goes in the repo.
+> **A) This project** — `.claude/rules/` in your repo. Committed to git, shared with anyone who clones it.
 >
-> **B) Personal** — I'll save them to `~/.claude/skills/coding-standards/` on your machine. They apply to YOU across all projects, but teammates won't have them.
+> **B) Personal** — `~/.claude/skills/` on your machine. Applies to all your projects, just for you.
 >
-> **C) Both** — Shared team rules in the project repo + your personal preferences in `~/.claude/skills/`.
->
-> [Based on what I see: your project has [N contributors / a remote / .claude/ already exists], so I'd recommend **A (Project)** — your team will thank you.]"
-
-**Decision guidance for Claude:**
-- Solo developer, single project -> recommend **B (Personal)** — simpler
-- Solo developer, multiple projects -> recommend **B (Personal)** — rules apply everywhere
-- Team project (2+ contributors) -> recommend **A (Project)** — shared enforcement
-- Team project where dev has personal extras -> recommend **C (Both)**
-- Open source project -> recommend **A (Project)** — contributors get standards on clone
-- If unsure, ask: "Is anyone else working in this codebase?"
+> **C) Both** — shared rules in the project + personal extras on your machine."
 
 #### Option A: Project-scoped (team)
 
