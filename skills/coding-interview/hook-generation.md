@@ -336,7 +336,7 @@ done
 
 ---
 
-#### PHP
+#### PHP / Laravel
 
 ```bash
 PHP_FILES=$(echo "$STAGED" | grep -E '\.php$' || true)
@@ -346,15 +346,193 @@ for file in $PHP_FILES; do
   content=$(staged_content "$file")
   CHECKED=$((CHECKED + 1))
 
-  # No var_dump/dd left in
-  if echo "$content" | grep -qE '\b(var_dump|dd|dump)\s*\('; then
+  # No debug functions left in
+  if echo "$content" | grep -qE '\b(var_dump|dd|dump|print_r)\s*\('; then
     blocking "$file" "debug" "Debug function left in code"
   fi
 
   # No die/exit in application code
-  if ! echo "$file" | grep -qE '(artisan|console)'; then
+  if ! echo "$file" | grep -qE '(artisan|console|commands/)'; then
     if echo "$content" | grep -qE '\b(die|exit)\s*\('; then
       warning "$file" "quality" "die/exit in application code"
+    fi
+  fi
+
+  # No raw SQL without bindings (Laravel)
+  if echo "$content" | grep -qE 'DB::raw\(|->whereRaw\(' | grep -v '?\|:'; then
+    warning "$file" "security" "Raw SQL — use parameter bindings"
+  fi
+
+  # No env() outside config files (Laravel)
+  if ! echo "$file" | grep -qE 'config/'; then
+    if echo "$content" | grep -qE '\benv\s*\(' | grep -v 'config('; then
+      warning "$file" "laravel" "env() outside config/ — use config() helper instead"
+    fi
+  fi
+done
+```
+
+---
+
+#### C# / .NET
+
+```bash
+CS_FILES=$(echo "$STAGED" | grep -E '\.cs$' || true)
+[ -z "$CS_FILES" ] && exit 0
+
+for file in $CS_FILES; do
+  content=$(staged_content "$file")
+  CHECKED=$((CHECKED + 1))
+
+  # No Console.WriteLine in production (skip Program.cs, tests)
+  if ! echo "$file" | grep -qE '(Program\.cs|Test|\.Tests/)'; then
+    if echo "$content" | grep -qE 'Console\.Write(Line)?\('; then
+      warning "$file" "quality" "Console.Write in production — use ILogger"
+    fi
+  fi
+
+  # No Thread.Sleep (use Task.Delay)
+  if echo "$content" | grep -qE 'Thread\.Sleep\('; then
+    warning "$file" "quality" "Thread.Sleep — use await Task.Delay() instead"
+  fi
+
+  # No catch without logging
+  if echo "$content" | grep -qE 'catch\s*(\([^)]*\))?\s*\{\s*\}'; then
+    warning "$file" "error-handling" "Empty catch block — log or handle the exception"
+  fi
+done
+```
+
+---
+
+#### Elixir
+
+```bash
+EX_FILES=$(echo "$STAGED" | grep -E '\.(ex|exs)$' || true)
+[ -z "$EX_FILES" ] && exit 0
+
+for file in $EX_FILES; do
+  content=$(staged_content "$file")
+  CHECKED=$((CHECKED + 1))
+
+  # No IO.inspect left in (except tests)
+  if ! echo "$file" | grep -qE '(_test\.exs|test_helper\.exs)'; then
+    if echo "$content" | grep -qE 'IO\.inspect\('; then
+      warning "$file" "debug" "IO.inspect left in code — remove before shipping"
+    fi
+  fi
+
+  # No IEx.pry left in
+  if echo "$content" | grep -q 'IEx\.pry'; then
+    blocking "$file" "debug" "IEx.pry debugger left in code"
+  fi
+done
+```
+
+---
+
+#### Kotlin
+
+```bash
+KT_FILES=$(echo "$STAGED" | grep -E '\.kt$' || true)
+[ -z "$KT_FILES" ] && exit 0
+
+for file in $KT_FILES; do
+  content=$(staged_content "$file")
+  CHECKED=$((CHECKED + 1))
+
+  # Excessive !! (non-null assertion)
+  bang_count=$(echo "$content" | grep -cE '!!' || true)
+  if [ "$bang_count" -gt 5 ]; then
+    warning "$file" "null-safety" "$bang_count !! assertions — use safe calls (?.) or let/require"
+  fi
+
+  # No println in production
+  if ! echo "$file" | grep -qE '(Test|test|Main\.kt)'; then
+    if echo "$content" | grep -qE '\bprintln\s*\('; then
+      warning "$file" "quality" "println in production — use structured logging"
+    fi
+  fi
+done
+```
+
+---
+
+#### Scala
+
+```bash
+SCALA_FILES=$(echo "$STAGED" | grep -E '\.scala$' || true)
+[ -z "$SCALA_FILES" ] && exit 0
+
+for file in $SCALA_FILES; do
+  content=$(staged_content "$file")
+  CHECKED=$((CHECKED + 1))
+
+  # No println in production
+  if ! echo "$file" | grep -qE '(Test|Spec|test/)'; then
+    if echo "$content" | grep -qE '\bprintln\s*\('; then
+      warning "$file" "quality" "println in production — use logging"
+    fi
+  fi
+
+  # No var usage (prefer val for immutability)
+  var_count=$(echo "$content" | grep -cE '^\s*var\s' || true)
+  if [ "$var_count" -gt 3 ]; then
+    warning "$file" "quality" "$var_count var declarations — prefer val for immutability"
+  fi
+done
+```
+
+---
+
+#### Dart / Flutter
+
+```bash
+DART_FILES=$(echo "$STAGED" | grep -E '\.dart$' || true)
+[ -z "$DART_FILES" ] && exit 0
+
+for file in $DART_FILES; do
+  content=$(staged_content "$file")
+  CHECKED=$((CHECKED + 1))
+
+  # No print() in production (skip tests)
+  if ! echo "$file" | grep -qE '(_test\.dart|test/)'; then
+    if echo "$content" | grep -qE '\bprint\s*\('; then
+      warning "$file" "quality" "print() in production — use a logging package"
+    fi
+  fi
+
+  # No debugPrint left in
+  if echo "$content" | grep -qE 'debugPrint\('; then
+    warning "$file" "debug" "debugPrint left in code"
+  fi
+done
+```
+
+---
+
+#### Swift
+
+```bash
+SWIFT_FILES=$(echo "$STAGED" | grep -E '\.swift$' || true)
+[ -z "$SWIFT_FILES" ] && exit 0
+
+for file in $SWIFT_FILES; do
+  content=$(staged_content "$file")
+  CHECKED=$((CHECKED + 1))
+
+  # No force unwrap (!) in production
+  if ! echo "$file" | grep -qE '(Tests|Test)'; then
+    bang_count=$(echo "$content" | grep -cE '[a-zA-Z]!' | grep -v '//' || true)
+    if [ "$bang_count" -gt 5 ]; then
+      warning "$file" "safety" "$bang_count force unwraps — use guard let / if let / nil coalescing"
+    fi
+  fi
+
+  # No print() in production
+  if ! echo "$file" | grep -qE '(Tests|Test|Preview)'; then
+    if echo "$content" | grep -qE '\bprint\s*\('; then
+      warning "$file" "quality" "print() in production — use os_log or Logger"
     fi
   fi
 done
