@@ -1,5 +1,7 @@
 # Tailwind CSS & Design Tokens
 
+> **Scope:** This file applies to projects using Tailwind CSS. If your project uses CSS modules, styled-components, or another styling approach, the design token principles still apply (use semantic tokens, not hardcoded values) but the Tailwind-specific patterns (cn(), CVA) don't.
+
 ## className Rules — Non-Negotiable
 
 ### Always use `cn()` for conditional classes

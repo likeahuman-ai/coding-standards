@@ -1,5 +1,7 @@
 # Component Architecture
 
+> **Scope:** This file applies to React/Next.js projects. Other frontend frameworks (Vue, Svelte, Angular) share the same principles (composition, small files, named exports) but have different syntax. Skip this file if your project doesn't use React.
+
 ## The Standard Component Skeleton
 
 ```typescript

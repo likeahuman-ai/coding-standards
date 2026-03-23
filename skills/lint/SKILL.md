@@ -30,7 +30,15 @@ Read project root for config files to determine language/framework:
 | `composer.json` | PHP |
 | `pubspec.yaml` | Flutter/Dart |
 
-Then detect sub-frameworks (Convex, Prisma, tRPC, Django, FastAPI, etc.) using `coding-interview/stack-detection.md` patterns.
+Then detect sub-frameworks by checking for their config files and dependencies:
+- `convex/schema.ts` -> Convex
+- `prisma/schema.prisma` -> Prisma
+- `drizzle.config.ts` -> Drizzle
+- `@trpc/server` in deps -> tRPC
+- `tailwind.config.*` -> Tailwind
+- `@clerk`, `next-auth` in deps -> Auth provider
+
+See `~/.claude/skills/coding-interview/stack-detection.md` for the full detection matrix.
 
 ### Step 2: Load Matching Rules
 

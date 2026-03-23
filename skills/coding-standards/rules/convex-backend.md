@@ -1,6 +1,6 @@
 # Convex Backend Standards
 
-> This file covers Convex-specific patterns. For general Node.js/TypeScript backend patterns (API routes, Server Actions, ORMs like Prisma/Drizzle, tRPC, raw SQL), see `nodejs-backend.md`. For state management between frontend and backend, see `state-management.md`.
+> **Scope:** This file applies only to projects using [Convex](https://convex.dev) as their backend. Skip it if you use Prisma, Drizzle, Supabase, or another backend. For general Node.js/TypeScript backend patterns (API routes, Server Actions, ORMs, tRPC), see `nodejs-backend.md`. For state management, see `state-management.md`.
 
 ## Function Type Selection
 

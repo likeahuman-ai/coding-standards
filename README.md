@@ -121,15 +121,57 @@ Supports `.coding-standards-ignore` for accepted tech debt.
 5. **Code speaks louder** — observe patterns before asking preferences
 6. **One source of truth** — one type, one constant, one component per concept
 
+## CLAUDE.md integration
+
+After running `./setup.sh`, add this to your `~/.claude/CLAUDE.md`:
+
+```markdown
+**Auto-loaded skills:** `coding-standards/SKILL.md` (coding rules and quality standards)
+```
+
+This tells Claude Code to read the standards at the start of every conversation.
+
+## Update
+
+```bash
+cd coding-standards
+git pull
+./setup.sh
+```
+
+Existing standards in `~/.claude/skills/coding-standards/` are backed up to `coding-standards.bak/` before overwriting.
+
+## Uninstall
+
+```bash
+rm -rf ~/.claude/skills/coding-standards
+rm -rf ~/.claude/skills/coding-interview
+rm -rf ~/.claude/skills/lint
+rm -rf ~/.claude/skills/organize
+```
+
+Then remove the `coding-standards/SKILL.md` line from your `~/.claude/CLAUDE.md`.
+
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| `/coding-interview` not recognized | Run `./setup.sh` again — skills must be in `~/.claude/skills/` |
+| `/lint` shows no results | Check that source files exist in the expected paths (`src/**/*.ts`, `**/*.py`, etc.) |
+| Pre-commit hook blocks everything | Run `./scripts/check-coding-standards.sh` directly to see output. Fix violations or add to `.coding-standards-ignore` |
+| Pre-commit hook permission denied | `chmod +x scripts/check-coding-standards.sh` |
+| Standards feel wrong for my project | Run `/coding-interview refresh` to re-analyze and adjust |
+| Want to add rules for a new area | Run `/coding-interview extend` |
+
 ## Requirements
 
-- Claude Code CLI
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
 - git + bash (no other dependencies)
 - Works on macOS and Linux
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE)
 
 ---
 

@@ -2,6 +2,11 @@
 
 After the interview produces coding standards, offer to generate enforcement hooks. The hook script adapts to whatever stack was detected.
 
+**Important distinction:**
+- The **coding-standards rules** live in `~/.claude/skills/coding-standards/` (Claude Code's skill directory)
+- The **pre-commit hook script** lives in your **project repo** at `scripts/check-coding-standards.sh`
+- The **hook trigger** lives in your **project repo** at `.husky/pre-commit`, `.git/hooks/pre-commit`, or equivalent
+
 ## When to Offer
 
 At the end of Phase 5 (Generate Standards), always ask:
@@ -433,3 +438,15 @@ After setup, always confirm:
 >
 > You can skip with `git commit --no-verify` in emergencies.
 > Want to adjust any of these rules or severity levels?"
+
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| `permission denied: ./scripts/check-coding-standards.sh` | Run `chmod +x scripts/check-coding-standards.sh` |
+| Hook blocks commit but shows no output | Run `./scripts/check-coding-standards.sh` directly to see verbose output |
+| Hook runs but checks wrong language | Check that the script's file extension filters match your project (e.g., `.py` for Python) |
+| Want to skip the hook once | `git commit --no-verify` (use sparingly) |
+| Hook runs on every commit but I only want it on push | Move the script call from `.husky/pre-commit` to `.husky/pre-push` |
+| `go vet` or `cargo` errors when those tools aren't installed | Language-specific checks (go vet, cargo clippy) only run if the CLI is available; wrap with `command -v go &>/dev/null &&` |
+| Too many warnings on existing codebase | Add known violations to `.coding-standards-ignore` (see Phase 7 in SKILL.md) |

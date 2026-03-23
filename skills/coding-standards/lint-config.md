@@ -1,6 +1,14 @@
 # Lint Configuration — Severity Levels
 
-This file maps coding standards rules to severity levels for the `/lint` skill.
+This file maps coding standards rules to severity levels for the `/lint` skill and the pre-commit hook.
+
+### Severity definitions
+
+| Level | Pre-commit hook | `/lint` report | What it means |
+|---|---|---|---|
+| **BLOCKING** | Rejects the commit | Must fix before shipping | Rule violation that causes bugs, security issues, or severe inconsistency |
+| **WARNING** | Allows commit, shows alert | Should fix, not blocking | Code smell or drift from standards that won't cause immediate issues |
+| **INFO** | Not checked | Suggestion only | Opportunity to improve — not a violation |
 
 ## BLOCKING (must fix before shipping)
 

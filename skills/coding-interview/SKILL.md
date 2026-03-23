@@ -24,21 +24,21 @@ Before asking anything, analyze the codebase to understand what patterns already
 
 **Run these searches in parallel:**
 
-1. **Stack detection** — Read `package.json`, `tsconfig.json`, framework configs
-2. **Component patterns** — Read 5-8 component files across different domains. Note:
-   - How props are defined (inline vs extracted)
+1. **Stack detection** — Read `stack-detection.md` for the full matrix. Check config files (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc.) to identify language, framework, and sub-frameworks.
+2. **Frontend patterns** (if applicable) — Read 5-8 source files across different domains. Pick files from different areas (auth, main feature, settings). Note:
+   - How types/interfaces are defined (inline vs extracted)
    - How exports work (named vs default)
-   - How className is handled (cn, clsx, raw, template literals)
+   - How styling is handled (Tailwind cn(), CSS modules, styled-components, etc.)
    - File lengths and structure
-   - CVA usage or not
-3. **Backend patterns** — Read 3-5 backend files (API routes, Convex functions, tRPC routers). Note:
-   - Auth patterns
-   - Validation approach
-   - Error handling
-   - Database access patterns
-4. **State management** — Search for Zustand stores, React Query usage, Context providers
-5. **File organization** — Map the directory structure, note domain vs technical grouping
-6. **Existing standards** — Check for CLAUDE.md, .eslintrc, prettier config, existing skills
+   - Component/function patterns
+3. **Backend patterns** — Read 3-5 backend files (API routes, database queries, controllers, services). Note:
+   - Auth/authorization patterns
+   - Input validation approach
+   - Error handling patterns
+   - Database access patterns (ORM, query builders, raw SQL)
+4. **State management** (if frontend) — Search for state stores, data fetching patterns, context/providers
+5. **File organization** — Map the directory structure, note domain-driven vs technical grouping
+6. **Existing standards** — Check for CLAUDE.md, linter configs (.eslintrc, ruff.toml, .golangci.yml), formatter configs (prettier, black)
 7. **Git patterns** — Check recent commits for commit message style, branch naming
 
 **Output of Phase 1:** Internal notes (not shown to user yet). A profile of what the codebase already tells us.
@@ -120,11 +120,18 @@ After confirming all topics, identify what's NOT covered:
 Based on the interview, generate or update the coding-standards files:
 
 **If new project (`/coding-interview new`):**
-- Create the full `~/.claude/skills/coding-standards/` structure
-- Generate all rule files based on interview answers
-- Create checklists
-- Create lint-config
-- Update CLAUDE.md to reference coding-standards
+
+All files are generated in `~/.claude/skills/coding-standards/` (your Claude Code skills directory, NOT your project repo). The pre-commit hook script is generated in your project's `scripts/` folder.
+
+Files created:
+- `SKILL.md` — entry point with philosophy + manifest
+- `lint-config.md` — severity levels (BLOCKING/WARNING/INFO)
+- `rules/` — only the rule files matching your detected stack (see stack-detection.md Step 4)
+- `checklists/before-creating.md` — 5 pre-coding questions
+- `checklists/before-committing.md` — post-write validation checklist
+- `scripts/check-coding-standards.sh` — pre-commit hook (in your PROJECT repo)
+
+Then update `~/.claude/CLAUDE.md` to auto-load the standards.
 
 **If refresh (`/coding-interview refresh`):**
 - Re-analyze codebase against existing standards
