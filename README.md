@@ -11,7 +11,17 @@ A skill suite for Claude Code that interviews you about your coding preferences,
 | **Lint** | `/lint` | On-demand code quality audit. Auto-detects your stack and applies matching rules |
 | **Organize** | `/organize` | Restructures any folder into domain-driven layout with import updates |
 
-## Quick start
+## Install
+
+### Option A: Plugin install (recommended)
+
+```
+/plugin install coding-standards@likeahuman-ai
+```
+
+This installs it as a Claude Code plugin — skills are loaded automatically, no manual CLAUDE.md editing needed.
+
+### Option B: Manual install
 
 ```bash
 git clone https://github.com/likeahuman-ai/coding-standards.git
@@ -19,7 +29,14 @@ cd coding-standards
 ./setup.sh
 ```
 
-Then in Claude Code:
+Then add to your `~/.claude/CLAUDE.md`:
+```
+Auto-loaded skills: coding-standards/SKILL.md
+```
+
+### Get started
+
+In Claude Code:
 
 ```
 /coding-interview new
@@ -121,36 +138,43 @@ Supports `.coding-standards-ignore` for accepted tech debt.
 5. **Code speaks louder** — observe patterns before asking preferences
 6. **One source of truth** — one type, one constant, one component per concept
 
-## CLAUDE.md integration
+## CLAUDE.md integration (manual install only)
 
-After running `./setup.sh`, add this to your `~/.claude/CLAUDE.md`:
+If you used `./setup.sh` (not plugin install), add this to your `~/.claude/CLAUDE.md`:
 
 ```markdown
 **Auto-loaded skills:** `coding-standards/SKILL.md` (coding rules and quality standards)
 ```
 
-This tells Claude Code to read the standards at the start of every conversation.
+Plugin installs handle this automatically.
 
 ## Update
 
-```bash
-cd coding-standards
-git pull
-./setup.sh
+**Plugin:**
+```
+/plugin update coding-standards@likeahuman-ai
 ```
 
-Existing standards in `~/.claude/skills/coding-standards/` are backed up to `coding-standards.bak/` before overwriting.
+**Manual:**
+```bash
+cd coding-standards && git pull && ./setup.sh
+```
 
 ## Uninstall
 
+**Plugin:**
+```
+/plugin uninstall coding-standards@likeahuman-ai
+```
+
+**Manual:**
 ```bash
 rm -rf ~/.claude/skills/coding-standards
 rm -rf ~/.claude/skills/coding-interview
 rm -rf ~/.claude/skills/lint
 rm -rf ~/.claude/skills/organize
 ```
-
-Then remove the `coding-standards/SKILL.md` line from your `~/.claude/CLAUDE.md`.
+Then remove the `coding-standards/SKILL.md` line from `~/.claude/CLAUDE.md`.
 
 ## Troubleshooting
 

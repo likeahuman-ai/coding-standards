@@ -1,0 +1,8 @@
+{
+  "name": "coding-standards",
+  "description": "Interview developers to extract coding preferences, generate personalized standards, and enforce them with pre-commit hooks. Auto-detects stack (TypeScript, Python, Go, Rust, Ruby, PHP).",
+  "author": {
+    "name": "likeahuman.ai",
+    "email": "hello@likeahuman.ai"
+  }
+}
