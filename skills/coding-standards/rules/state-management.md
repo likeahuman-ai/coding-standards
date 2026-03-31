@@ -30,9 +30,7 @@ Derived state (totals, filtered lists, computed values)
   -> useMemo only if computation is expensive AND profiling confirms it
 ```
 
-## Client State Store
-
-Examples below use Zustand. If your project uses Redux, Jotai, XState, MobX, or Pinia (Vue), the same decision matrix applies — the tool changes, the principles don't. Use whatever your project already has.
+## Zustand — The Default Client Store
 
 ### Store Design
 

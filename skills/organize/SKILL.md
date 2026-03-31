@@ -35,10 +35,10 @@ Analyze the target folder to determine:
 
 ### Step 2: Look Up Best Practices
 
-Check framework-specific conventions using built-in knowledge or documentation:
-- Framework-specific conventions (e.g., Next.js App Router uses file-based routing, Convex namespaces functions by path)
+Use context7 MCP or built-in knowledge to check:
+- Framework-specific conventions (e.g., Convex supports subdirectories and namespaces functions by path)
 - Community patterns (e.g., "screaming architecture", feature-first, domain-driven)
-- Known constraints (e.g., some frameworks change API paths when files move to subdirectories)
+- Known constraints (e.g., Convex changes API paths when files move to subdirs)
 
 **Framework-specific patterns:**
 

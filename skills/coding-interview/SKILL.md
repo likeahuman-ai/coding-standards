@@ -7,7 +7,7 @@ args: "[new|refresh|extend] — new = fresh interview, refresh = re-analyze code
 
 # /coding-interview — Coding Style Interview
 
-Extract a developer's coding DNA through structured conversation and codebase analysis. Generates personalized coding standards — either in the project (for teams) or personally (for individuals).
+Extract a developer's coding DNA through structured conversation and codebase analysis. Produces or updates `~/.claude/skills/coding-standards/` files.
 
 ## When to Use
 
@@ -24,21 +24,21 @@ Before asking anything, analyze the codebase to understand what patterns already
 
 **Run these searches in parallel:**
 
-1. **Stack detection** — Read `stack-detection.md` for the full matrix. Check config files (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc.) to identify language, framework, and sub-frameworks.
-2. **Frontend patterns** (if applicable) — Read 5-8 source files across different domains. Pick files from different areas (auth, main feature, settings). Note:
-   - How types/interfaces are defined (inline vs extracted)
+1. **Stack detection** — Read `package.json`, `tsconfig.json`, framework configs
+2. **Component patterns** — Read 5-8 component files across different domains. Note:
+   - How props are defined (inline vs extracted)
    - How exports work (named vs default)
-   - How styling is handled (Tailwind cn(), CSS modules, styled-components, etc.)
+   - How className is handled (cn, clsx, raw, template literals)
    - File lengths and structure
-   - Component/function patterns
-3. **Backend patterns** — Read 3-5 backend files (API routes, database queries, controllers, services). Note:
-   - Auth/authorization patterns
-   - Input validation approach
-   - Error handling patterns
-   - Database access patterns (ORM, query builders, raw SQL)
-4. **State management** (if frontend) — Search for state stores, data fetching patterns, context/providers
-5. **File organization** — Map the directory structure, note domain-driven vs technical grouping
-6. **Existing standards** — Check for CLAUDE.md, linter configs (.eslintrc, ruff.toml, .golangci.yml), formatter configs (prettier, black)
+   - CVA usage or not
+3. **Backend patterns** — Read 3-5 backend files (API routes, Convex functions, tRPC routers). Note:
+   - Auth patterns
+   - Validation approach
+   - Error handling
+   - Database access patterns
+4. **State management** — Search for Zustand stores, React Query usage, Context providers
+5. **File organization** — Map the directory structure, note domain vs technical grouping
+6. **Existing standards** — Check for CLAUDE.md, .eslintrc, prettier config, existing skills
 7. **Git patterns** — Check recent commits for commit message style, branch naming
 
 **Output of Phase 1:** Internal notes (not shown to user yet). A profile of what the codebase already tells us.
@@ -117,78 +117,14 @@ After confirming all topics, identify what's NOT covered:
 
 ### Phase 5: Generate Standards
 
-Before generating, ask where to save:
-
-> "Where should I put the coding standards?
->
-> **A) This project** — `.claude/rules/` in your repo. Committed to git, shared with anyone who clones it.
->
-> **B) Personal** — `~/.claude/skills/` on your machine. Applies to all your projects, just for you.
->
-> **C) Both** — shared rules in the project + personal extras on your machine."
-
-#### Option A: Project-scoped (team)
-
-```
-your-project/
-  .claude/
-    settings.json               # Can reference the standards
-    rules/                      # Project coding standards (committed to git)
-      coding-standards.md       # Entry point with philosophy + manifest
-      reuse-first.md
-      naming-conventions.md
-      file-organization.md
-      [stack-specific].md       # Only the rules matching this project's stack
-      ...
-    checklists/
-      before-creating.md
-      before-committing.md
-  scripts/
-    check-coding-standards.sh   # Pre-commit hook (committed to git)
-```
-
-This means:
-- Standards are **version-controlled** alongside the code
-- Every developer who clones the repo gets the same rules
-- Claude Code auto-reads `.claude/rules/*.md` for every conversation in this project
-- PRs can include rule changes (reviewed like any code change)
-- The pre-commit hook is also committed — enforced for the whole team
-
-#### Option B: Personal (individual)
-
-```
-~/.claude/skills/coding-standards/
-  SKILL.md
-  lint-config.md
-  rules/
-    [all rule files]
-  checklists/
-    [all checklists]
-```
-
-This means:
-- Rules apply to YOU across all projects
-- Not shared with teammates
-- Good for personal style preferences that apply everywhere
-
-#### Option C: Both (team + personal overrides)
-
-- Shared rules in `.claude/rules/` (committed)
-- Personal overrides or additions in `~/.claude/skills/coding-standards/`
-- Personal rules take precedence when both exist for the same topic
-
-#### What gets generated
-
-Files created (in whichever location chosen):
-- Entry point with philosophy + manifest
-- `lint-config.md` — severity levels (BLOCKING/WARNING/INFO)
-- `rules/` — only the rule files matching your detected stack (see stack-detection.md Step 4)
-- `checklists/before-creating.md` — 5 pre-coding questions
-- `checklists/before-committing.md` — post-write validation checklist
-- `scripts/check-coding-standards.sh` — pre-commit hook (always in PROJECT repo)
+Based on the interview, generate or update the coding-standards files:
 
 **If new project (`/coding-interview new`):**
-- Full interview, generates all files in chosen location
+- Create the full `~/.claude/skills/coding-standards/` structure
+- Generate all rule files based on interview answers
+- Create checklists
+- Create lint-config
+- Update CLAUDE.md to reference coding-standards
 
 **If refresh (`/coding-interview refresh`):**
 - Re-analyze codebase against existing standards
@@ -341,92 +277,62 @@ The generated standards must be:
 
 ## File Structure to Generate
 
-**Project-scoped (team):**
-```
-your-project/
-├── .claude/
-│   └── rules/                        # Claude reads these automatically
-│       ├── coding-standards.md       # Entry point with philosophy
-│       ├── reuse-first.md
-│       ├── naming-conventions.md
-│       ├── [stack-specific].md       # Only files matching detected stack
-│       └── ...
-├── scripts/
-│   └── check-coding-standards.sh     # Pre-commit hook
-└── .coding-standards-ignore          # Accepted tech debt
-```
-
-**Personal:**
 ```
 ~/.claude/skills/coding-standards/
-├── SKILL.md                          # Entry point (auto-loaded)
+├── SKILL.md                          # Entry point + manifest
 ├── lint-config.md                    # Severity levels
 ├── rules/
-│   └── [stack-specific].md           # Only files matching detected stack
+│   ├── reuse-first.md                # Extend vs create philosophy
+│   ├── component-architecture.md     # Component anatomy, props, CVA
+│   ├── naming-conventions.md         # All naming rules
+│   ├── file-organization.md          # Domain-driven structure
+│   ├── types-and-constants.md        # Type/constant reuse hierarchy
+│   ├── typescript-quality.md         # Strict mode, type patterns
+│   ├── react-patterns.md             # Server/client, hooks, anti-patterns
+│   ├── tailwind-and-tokens.md        # Styling rules (if Tailwind)
+│   ├── state-management.md           # Where state lives
+│   ├── [backend].md                  # Backend-specific (convex/prisma/etc)
+│   ├── security.md                   # Auth, validation, secrets
+│   ├── error-handling.md             # Boundaries, retry, resilience
+│   └── general-quality.md            # Idioms, comments, defensive coding
 └── checklists/
-    ├── before-creating.md
-    └── before-committing.md
+    ├── before-creating.md            # Pre-coding guard
+    └── before-committing.md          # Post-write checklist
 ```
 
-Only generate rule files for stacks detected in the project. A Go project doesn't get `react-patterns.md`. A Django project doesn't get `typescript-quality.md`. See `stack-detection.md` Step 4 for the mapping.
+Not all files are needed for every project. Skip files for areas the project doesn't use (e.g., skip convex-backend.md for a Prisma project).
 
-### Phase 6: Wire Everything Together
+### Phase 6: Wire Into CLAUDE.md
 
-After generating all files, connect them so Claude and the team always see the standards.
+After generating all files, integrate them so Claude always sees the standards:
 
-#### If Project-scoped (Option A):
-
-1. **Create/update `.claude/rules/`** — files are already there from Phase 5
-2. **Create/update project CLAUDE.md** (`.claude/CLAUDE.md` or root `CLAUDE.md`):
-   - Add: "Coding standards are in `.claude/rules/` — Claude reads them automatically"
-   - Remove any duplicated coding rules from existing CLAUDE.md
-   - Keep project-specific info (token catalogs, architecture, workflow)
-3. **Set up pre-commit hook** in the project:
-   - Generate `scripts/check-coding-standards.sh` with stack-appropriate checks (read `hook-generation.md`)
-   - Detect existing hook system (Husky? pre-commit? Lefthook? raw git?) or recommend one
-   - Wire the script into the hook system
-   - Commit both the script and hook config to git
-4. **Add `.coding-standards-ignore`** to the project root (empty, with header comments explaining format)
-5. **Confirm with developer** and suggest they commit:
-   > "Standards are set up for your team:
-   > - Created: `.claude/rules/` with [N] rule files
-   > - Created: `scripts/check-coding-standards.sh` (pre-commit hook)
-   > - Updated: CLAUDE.md
-   >
-   > When your teammates pull these changes, they'll get:
-   > - Claude automatically following the standards (via `.claude/rules/`)
-   > - Pre-commit hook enforcing rules on every commit
-   >
-   > Want me to commit these files now?"
-
-#### If Personal (Option B):
-
-1. **Files are in `~/.claude/skills/coding-standards/`** — already there from Phase 5
-2. **Update global CLAUDE.md** (`~/.claude/CLAUDE.md`):
+1. **Global CLAUDE.md** (`~/.claude/CLAUDE.md`):
    - Add `coding-standards/SKILL.md` to auto-loaded skills list
-   - Remove any duplicated coding rules
-3. **Set up pre-commit hook** in the current project:
-   - Still generate `scripts/check-coding-standards.sh` in the PROJECT (enforcement is always project-level)
-   - Wire into hook system
-4. **Confirm**:
-   > "Standards are set up for you personally:
-   > - Created: `~/.claude/skills/coding-standards/` with [N] rule files
-   > - Created: `scripts/check-coding-standards.sh` in this project
+   - Remove any duplicated coding rules (they now live in coding-standards)
+   - Add a "Coding Standards" section pointing to the skill
+
+2. **Project CLAUDE.md** (if exists):
+   - Remove duplicated coding rules
+   - Keep project-specific info (token catalogs, DLS inventory, workflow)
+   - Add pointer: "All coding rules in `~/.claude/skills/coding-standards/`"
+
+3. **Existing lint/organize skills** (if they exist):
+   - Update to reference `coding-standards/lint-config.md` for severity
+   - Remove their own rule copies
+
+4. **Delete redundant files**:
+   - Any old skill files whose content was consolidated into coding-standards
+   - Confirm with developer before deleting
+
+5. **Confirm with developer**:
+   > "Standards are set up. Here's what changed:
+   > - Created: [N] rule files in coding-standards/
+   > - Updated: CLAUDE.md (removed [N] lines of duplicated rules)
+   > - Deleted: [list of old files]
+   > - Pre-commit hook: [installed/offered]
    >
-   > These rules apply to all your projects. The pre-commit hook is project-specific."
-
-#### If Both (Option C):
-
-1. Do both: project `.claude/rules/` for team + `~/.claude/skills/coding-standards/` for personal
-2. Personal rules supplement/override project rules
-3. Pre-commit hook is always in the project
-
-#### Clean up redundant files
-
-Regardless of scope:
-- Delete any old skill files whose content was consolidated into coding-standards
-- Confirm with developer before deleting anything
-- If they had scattered rules in CLAUDE.md, lint configs, etc. — consolidate into the new structure
+   > From now on, coding-standards/ is the single source of truth.
+   > Use `/coding-interview refresh` anytime to re-analyze."
 
 ## Sub-Files (Read During Execution)
 

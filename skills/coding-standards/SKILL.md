@@ -10,10 +10,10 @@ This is the authoritative reference for how code should be written across all pr
 ## Core Philosophy
 
 1. **Reuse first** — extend existing components/types/constants before creating new ones
-2. **Building bricks** — components are small, generic, reusable units (like `Card`, `Badge`, `Input`) that get composed into larger features. The business logic lives in the composition, not the brick itself.
-3. **Domain-driven** — organize files by what they do (auth/, billing/, courses/), not what they are (controllers/, models/, utils/). A "domain" = a feature area or bounded context in your app.
-4. **Minimum viable complexity** — three similar lines beat a premature abstraction. Extract only when the third occurrence appears.
-5. **Single source of truth** — one type, one constant, one component per concept. If it exists, import it. Don't duplicate.
+2. **Building bricks** — components are generic materials, business logic lives in composition
+3. **Domain-driven** — organize by domain, not by technical role
+4. **Minimum viable complexity** — three similar lines beat a premature abstraction
+5. **Single source of truth** — one type, one constant, one component per concept
 
 ## How This Skill Works
 
