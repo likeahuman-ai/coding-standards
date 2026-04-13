@@ -13,24 +13,18 @@
 
 Your AI writes code without knowing your rules. Every project has different conventions, every team has different opinions, and Claude just guesses.
 
-This plugin fixes that. It interviews you about how you like your code, analyzes your actual codebase, generates personalized standards, and enforces them with a pre-commit hook. No more reviewing AI output for style violations.
+This skill suite fixes that. It interviews you about how you like your code, analyzes your actual codebase, generates personalized standards, and enforces them with a pre-commit hook. No more reviewing AI output for style violations.
 
 ## What's inside
 
 | Skill | Command | What it does |
 |-------|---------|-------------|
-| **Coding Interview** | `/coding-standards:coding-interview` | Analyzes your codebase, interviews you step-by-step, generates personalized standards + pre-commit hook |
+| **Coding Interview** | `/coding-interview` | Analyzes your codebase, interviews you step-by-step, generates personalized standards + pre-commit hook |
 | **Coding Standards** | Auto-loaded | Rule files generated for YOUR stack — only the ones that match |
-| **Lint** | `/coding-standards:lint` | On-demand code quality audit. Auto-detects stack, applies matching rules |
-| **Organize** | `/coding-standards:organize` | Restructures any folder into domain-driven layout with import updates |
+| **Lint** | `/lint` | On-demand code quality audit. Auto-detects stack, applies matching rules |
+| **Organize** | `/organize` | Restructures any folder into domain-driven layout with import updates |
 
 ## Install
-
-```
-/plugin install coding-standards@likeahuman-ai
-```
-
-Or manually:
 
 ```bash
 git clone https://github.com/likeahuman-ai/coding-standards.git
@@ -38,9 +32,15 @@ cd coding-standards
 ./setup.sh
 ```
 
+The installer copies the four skills into `~/.claude/skills/` so they're available in every Claude Code session. Then add this line to your `~/.claude/CLAUDE.md`:
+
+```
+Auto-loaded skills: coding-standards/SKILL.md
+```
+
 ## How it works
 
-1. Run `/coding-standards:coding-interview new`
+1. Run `/coding-interview new`
 2. It silently analyzes your codebase — detects stack, reads components, backend, config, git history
 3. Presents your "Code Style Profile" based on what it found
 4. Interviews you topic-by-topic to confirm and deepen
@@ -152,12 +152,12 @@ rules/
 
 | Command | When to use |
 |---------|-------------|
-| `/coding-standards:coding-interview new` | First time — full interview + generation |
-| `/coding-standards:coding-interview refresh` | Quarterly — re-analyze codebase for drift |
-| `/coding-standards:coding-interview extend` | Add rules for a new area (mobile, testing, CI/CD) |
-| `/coding-standards:lint` | Before shipping — deep audit |
-| `/coding-standards:lint path/to/file` | Quick check on specific file |
-| `/coding-standards:organize path/to/dir` | Restructure a messy directory |
+| `/coding-interview new` | First time — full interview + generation |
+| `/coding-interview refresh` | Quarterly — re-analyze codebase for drift |
+| `/coding-interview extend` | Add rules for a new area (mobile, testing, CI/CD) |
+| `/lint` | Before shipping — deep audit |
+| `/lint path/to/file` | Quick check on specific file |
+| `/organize path/to/dir` | Restructure a messy directory |
 
 ## Philosophy
 
@@ -170,26 +170,35 @@ rules/
 
 ## Update
 
+```bash
+cd coding-standards
+git pull
+./setup.sh
 ```
-/plugin update coding-standards@likeahuman-ai
-```
+
+The installer backs up any existing skill to `<skill>.bak` before overwriting.
 
 ## Uninstall
 
+```bash
+rm -rf ~/.claude/skills/coding-standards
+rm -rf ~/.claude/skills/coding-interview
+rm -rf ~/.claude/skills/lint
+rm -rf ~/.claude/skills/organize
 ```
-/plugin uninstall coding-standards@likeahuman-ai
-```
+
+Also remove the `Auto-loaded skills: coding-standards/SKILL.md` line from your `~/.claude/CLAUDE.md`.
 
 ## Troubleshooting
 
 | Problem | Solution |
 |---|---|
-| Skills not recognized | Run `/reload-plugins` |
+| Skills not recognized | Restart Claude Code after running `./setup.sh` |
 | `/lint` shows no results | Check source files exist in expected paths |
 | Pre-commit blocks everything | Run `./scripts/check-coding-standards.sh` directly to see output |
 | Hook permission denied | `chmod +x scripts/check-coding-standards.sh` |
-| Standards feel wrong | `/coding-standards:coding-interview refresh` |
-| Need rules for new area | `/coding-standards:coding-interview extend` |
+| Standards feel wrong | `/coding-interview refresh` |
+| Need rules for new area | `/coding-interview extend` |
 
 ## Requirements
 
