@@ -4,10 +4,10 @@
 # ==============================================================================
 # Installs the coding-standards skill suite into your Claude Code environment.
 #
-# Usage:
-#   curl -fsSL https://raw.githubusercontent.com/likeahuman-ai/coding-standards/main/setup.sh | bash
+# Usage (LEGACY — prefer /plugin install likeahuman-ai/coding-standards):
+#   curl -fsSL https://raw.githubusercontent.com/likeahuman-ai/coding-standards/main/legacy/setup.sh | bash
 #   # or
-#   git clone https://github.com/likeahuman-ai/coding-standards.git && cd coding-standards && ./setup.sh
+#   git clone https://github.com/likeahuman-ai/coding-standards.git && cd coding-standards && ./legacy/setup.sh
 # ==============================================================================
 
 set -euo pipefail

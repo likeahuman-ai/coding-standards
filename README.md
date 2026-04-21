@@ -41,19 +41,7 @@ This skill suite fixes that. It interviews you about how you like your code, ana
 
 Either command registers the four skills with Claude Code automatically — no CLAUDE.md edits needed. Then run `/coding-interview` in any project.
 
-**Legacy manual install** (for non-plugin setups or self-hosted Claude Code):
-
-```bash
-git clone https://github.com/likeahuman-ai/coding-standards.git
-cd coding-standards
-./setup.sh
-```
-
-The installer copies the skills into `~/.claude/skills/`. Add this line to your `~/.claude/CLAUDE.md`:
-
-```
-Auto-loaded skills: coding-standards/SKILL.md
-```
+**Legacy manual install** — archived at [`legacy/setup.sh`](./legacy/setup.sh). Prefer the `/plugin install` flow above; the legacy installer is preserved for non-plugin Claude Code setups and self-hosted environments.
 
 ## How it works
 
