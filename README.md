@@ -26,13 +26,30 @@ This skill suite fixes that. It interviews you about how you like your code, ana
 
 ## Install
 
+**Recommended — via the Like A Human plugin marketplace:**
+
+```bash
+/plugin marketplace add likeahuman-ai/claude-plugins
+/plugin install coding-standards
+```
+
+**Or install this plugin directly (no marketplace):**
+
+```bash
+/plugin install likeahuman-ai/coding-standards
+```
+
+Either command registers the four skills with Claude Code automatically — no CLAUDE.md edits needed. Then run `/coding-interview` in any project.
+
+**Legacy manual install** (for non-plugin setups or self-hosted Claude Code):
+
 ```bash
 git clone https://github.com/likeahuman-ai/coding-standards.git
 cd coding-standards
 ./setup.sh
 ```
 
-The installer copies the four skills into `~/.claude/skills/` so they're available in every Claude Code session. Then add this line to your `~/.claude/CLAUDE.md`:
+The installer copies the skills into `~/.claude/skills/`. Add this line to your `~/.claude/CLAUDE.md`:
 
 ```
 Auto-loaded skills: coding-standards/SKILL.md
