@@ -1,27 +1,14 @@
 {
   "name": "coding-standards",
   "version": "1.0.0",
-  "description": "Interview developers to extract coding preferences, generate personalized standards, and enforce them with pre-commit hooks. Auto-detects stack (TypeScript, Python, Go, Rust, Ruby, PHP).",
+  "description": "Interview developers to extract coding preferences, generate personalized standards, and enforce with pre-commit hooks. Auto-detects stack.",
   "author": {
-    "name": "likeahuman.ai",
-    "email": "hello@likeahuman.ai",
+    "name": "LikeAHuman.ai",
+    "email": "academy@likeahuman.ai",
     "url": "https://likeahuman.ai"
   },
   "homepage": "https://github.com/likeahuman-ai/coding-standards",
   "repository": "https://github.com/likeahuman-ai/coding-standards",
   "license": "MIT",
-  "keywords": [
-    "coding-standards",
-    "code-review",
-    "linter",
-    "pre-commit",
-    "code-quality",
-    "interview",
-    "typescript",
-    "python",
-    "go",
-    "rust",
-    "react",
-    "nextjs"
-  ]
+  "skills": "./skills/"
 }
