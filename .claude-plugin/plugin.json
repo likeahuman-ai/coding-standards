@@ -1,7 +1,7 @@
 {
   "name": "coding-standards",
   "version": "1.0.0",
-  "description": "Interview developers to extract coding preferences, generate personalized standards, and enforce with pre-commit hooks. Auto-detects stack.",
+  "description": "Interview developers, generate standards, enforce with pre-commit hooks",
   "author": {
     "name": "LikeAHuman.ai",
     "email": "academy@likeahuman.ai",
